@@ -1,10 +1,3 @@
-/*
- * Timers.c
- *
- *  Created on: 24.09.2017
- *      Author: anonymous
- */
-
 #include "globals.h"
 #include "defines.h"
 #include <stdio.h>
@@ -23,51 +16,50 @@ portMUX_TYPE muxer1 = portMUX_INITIALIZER_UNLOCKED;
 portMUX_TYPE muxer2 = portMUX_INITIALIZER_UNLOCKED;
 
 void IRAM_ATTR timer1ISR() {
-	portENTER_CRITICAL_ISR(&muxer1);
+    portENTER_CRITICAL_ISR(&muxer1);
 
-	if (dir_M1 != 0) {
-		// We generate 1us STEP pulse
-		digitalWrite(PIN_MOTOR1_STEP, HIGH);
+    if (dir_M1 != 0) {
+        // We generate 1us STEP pulse
+        digitalWrite(PIN_MOTOR1_STEP, HIGH);
 
-		if (dir_M1 > 0)
-			steps1--;
-		else
-			steps1++;
+        if (dir_M1 > 0)
+            steps1--;
+        else
+            steps1++;
 
-		digitalWrite(PIN_MOTOR1_STEP, LOW);
-	}
+        digitalWrite(PIN_MOTOR1_STEP, LOW);
+    }
 
-	portEXIT_CRITICAL_ISR(&muxer1);
+    portEXIT_CRITICAL_ISR(&muxer1);
 }
+
 void IRAM_ATTR timer2ISR() {
-	portENTER_CRITICAL_ISR(&muxer2);
+    portENTER_CRITICAL_ISR(&muxer2);
 
-	if (dir_M2 != 0) {
-		// We generate 1us STEP pulse
-		digitalWrite(PIN_MOTOR2_STEP, HIGH);
+    if (dir_M2 != 0) {
+        // We generate 1us STEP pulse
+        digitalWrite(PIN_MOTOR2_STEP, HIGH);
 
-		if (dir_M2 > 0)
-			steps2--;
-		else
-			steps2++;
+        if (dir_M2 > 0)
+            steps2--;
+        else
+            steps2++;
 
-		digitalWrite(PIN_MOTOR2_STEP, LOW);
-	}
-	portEXIT_CRITICAL_ISR(&muxer2);
+        digitalWrite(PIN_MOTOR2_STEP, LOW);
+    }
+
+    portEXIT_CRITICAL_ISR(&muxer2);
 }
 }
 
 void initTimers() {
+    // Initialisation de timer1 (pour moteur 1)
+    timer1 = timerBegin(1000000);  // 1 MHz (1 µs/tick), équivalent à un prescaler de 80
+    timerAttachInterrupt(timer1, &timer1ISR);  // Attacher ISR
+    timerAlarm(timer1, ZERO_SPEED, true, 0);   // Configurer l'alarme avec autoreload
 
-	timer1 = timerBegin(0, 40, true);
-	timerAttachInterrupt(timer1, &timer1ISR, true);
-	timerAlarmWrite(timer1, ZERO_SPEED, true);
-
-	timer2 = timerBegin(1, 40, true);
-	timerAttachInterrupt(timer2, &timer2ISR, true);
-	timerAlarmWrite(timer2, ZERO_SPEED, true);
-
-	timerAlarmEnable(timer1);
-	timerAlarmEnable(timer2);
-
+    // Initialisation de timer2 (pour moteur 2)
+    timer2 = timerBegin(1000000);  // 1 MHz (1 µs/tick), équivalent à un prescaler de 80
+    timerAttachInterrupt(timer2, &timer2ISR);  // Attacher ISR
+    timerAlarm(timer2, ZERO_SPEED, true, 0);   // Configurer l'alarme avec autoreload
 }

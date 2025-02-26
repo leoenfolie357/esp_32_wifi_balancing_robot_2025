@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include "defines.h"
 #include "globals.h"
+#include "esp32-hal-timer.h"  // Ajouté pour timerAlarm, au cas où
 
 // Set speed of Stepper Motor1
 // tspeed could be positive or negative (reverse)
@@ -49,10 +50,10 @@ void setMotorSpeedM1(int16_t tspeed)
     dir_M1 = -1;
     digitalWrite(PIN_MOTOR1_DIR, LOW);
   }
-  if (timer_period > ZERO_SPEED)   // Check for minimun speed (maximun period without overflow)
+  if (timer_period > ZERO_SPEED)   // Check for minimum speed (maximum period without overflow)
     timer_period = ZERO_SPEED;
 
-  timerAlarmWrite(timer1, timer_period, true);
+  timerAlarm(timer1, timer_period, true, 0);  // Corrigé : 4 arguments
 }
 
 // Set speed of Stepper Motor2
@@ -95,9 +96,8 @@ void setMotorSpeedM2(int16_t tspeed)
     dir_M2 = -1;
     digitalWrite(PIN_MOTOR2_DIR, HIGH);
   }
-  if (timer_period > ZERO_SPEED)   // Check for minimun speed (maximun period without overflow)
+  if (timer_period > ZERO_SPEED)   // Check for minimum speed (maximum period without overflow)
     timer_period = ZERO_SPEED;
 
-  timerAlarmWrite(timer2, timer_period, true);
+  timerAlarm(timer2, timer_period, true, 0);  // Corrigé : faute de frappe et 4 arguments
 }
-
